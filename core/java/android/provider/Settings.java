@@ -7565,6 +7565,12 @@ public final class Settings {
         public static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
 
         /**
+         * Whether to enable custom carrier label
+         * @hide
+         */
+        public static final String ENABLE_CUSTOM_CARRIER_LABEL = "enable_custom_carrier_label";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
