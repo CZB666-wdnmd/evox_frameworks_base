@@ -198,6 +198,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.DeviceIntegrationUtils;
 import android.os.Handler;
 import android.os.HandlerExecutor;
 import android.os.IBinder;
@@ -1733,7 +1734,9 @@ public class WindowManagerService extends IWindowManager.Stub
             win.initAppOpsState();
 
             // Device Integration: add black window if match
-            BlackScreenWindowManager.getInstance().onWindowAdded(win);
+            if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+                BlackScreenWindowManager.getInstance().onWindowAdded(win);
+            }
 
             win.setHiddenWhileSuspended(suspended);
 
@@ -1983,7 +1986,9 @@ public class WindowManagerService extends IWindowManager.Stub
         mWindowMap.remove(win.mClient.asBinder());
 
         // Device Integration: Remove black screen if match
-        BlackScreenWindowManager.getInstance().onWindowRemoved(win);
+        if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+            BlackScreenWindowManager.getInstance().onWindowRemoved(win);
+        }
 
         final DisplayContent dc = win.getDisplayContent();
         dc.getDisplayRotation().markForSeamlessRotation(win, false /* seamlesslyRotated */);
@@ -2632,7 +2637,7 @@ public class WindowManagerService extends IWindowManager.Stub
         WindowSurfaceController surfaceController;
         try {
             Trace.traceBegin(TRACE_TAG_WINDOW_MANAGER, "createSurfaceControl");
-            surfaceController = winAnimator.createSurfaceLocked(win.mAttrs.type);
+            surfaceController = winAnimator.createSurfaceLocked();
         } finally {
             Trace.traceEnd(TRACE_TAG_WINDOW_MANAGER);
         }
