@@ -71,6 +71,7 @@ public class PixelPropsUtils {
     private static final Map<String, Object> propsToChangeGeneric;
     private static final Map<String, Object> propsToChangeRecentPixel;
     private static final Map<String, Object> propsToChangePixelTablet;
+    private static final Map<String, Object> propsToChangeNothing;
     private static final Map<String, Object> propsToChangePixel5;
     private static final Map<String, Object> propsToChangeMeizu;
     private static final Map<String, ArrayList<String>> propsToKeep;
@@ -92,6 +93,11 @@ public class PixelPropsUtils {
             "com.google.android.wallpaper.effects",
             "com.google.pixel.livewallpaper",
             "com.microsoft.android.smsorganizer",
+            "com.google.android.apps.recorder",
+            "com.google.android.apps.wear.companion",
+            "com.google.android.googlequicksearchbox",
+            "com.google.ar.core",
+            "com.google.android.apps.bard",
             "com.nhs.online.nhsonline",
             "com.nothing.smartcenter",
             "in.startv.hotstar",
@@ -110,7 +116,6 @@ public class PixelPropsUtils {
             "com.google.android.apps.motionsense.bridge",
             "com.google.android.apps.nexuslauncher",
             "com.google.android.apps.pixelmigrate",
-            "com.google.android.apps.recorder",
             "com.google.android.apps.restore",
             "com.google.android.apps.tachyon",
             "com.google.android.apps.tycho",
@@ -122,7 +127,6 @@ public class PixelPropsUtils {
             "com.google.android.euicc",
             "com.google.android.setupwizard",
             "com.google.android.youtube",
-            "com.google.ar.core",
             "com.google.oslo"
     };
 
@@ -136,6 +140,10 @@ public class PixelPropsUtils {
             "cmccwm.mobilemusic",
             "cn.kuwo.player",
             "com.meizu.media.music"
+    };
+
+    private static final String[] packagesToChangeNothing = {
+            "com.zhenxi.hunter"
     };
 
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
@@ -177,6 +185,15 @@ public class PixelPropsUtils {
         propsToChangePixel5.put("MODEL", "Pixel 5");
         propsToChangePixel5.put("ID", "UP1A.231105.001");
         propsToChangePixel5.put("FINGERPRINT", "google/redfin/redfin:14/UP1A.231105.001/10817346:user/release-keys");
+        propsToChangeNothing = new HashMap<>();
+        propsToChangeNothing.put("BRAND", "Nothing");
+        propsToChangeNothing.put("MANUFACTURER", "Nothing");
+        propsToChangeNothing.put("DEVICE", "qssi");
+        propsToChangeNothing.put("PRODUCT", "qssi");
+        propsToChangeNothing.put("HARDWARE", "qssi");
+        propsToChangeNothing.put("MODEL", "NSSI");
+        propsToChangeNothing.put("ID", "UP1A.231005.007");
+        propsToChangeNothing.put("FINGERPRINT", "Nothing/qssi/qssi:14/UP1A.231005.007/2312281342:user/release-keys");
         propsToChangeMeizu = new HashMap<>();
         propsToChangeMeizu.put("BRAND", "meizu");
         propsToChangeMeizu.put("MANUFACTURER", "Meizu");
@@ -205,8 +222,9 @@ public class PixelPropsUtils {
     }
 
     private static boolean isGoogleCameraPackage(String packageName) {
-        return packageName.startsWith("com.google.android.GoogleCamera")
-            || Arrays.asList(customGoogleCameraPackages).contains(packageName);
+        return packageName.startsWith("com.google.android.GoogleCamera") ||
+            packageName.startsWith("com.android.MGC") ||
+            Arrays.asList(customGoogleCameraPackages).contains(packageName);
     }
 
     private static boolean shouldTryToCertifyDevice() {
@@ -368,6 +386,8 @@ public class PixelPropsUtils {
         } else if (SystemProperties.getBoolean(SPOOF_MUSIC_APPS, false)
                 && Arrays.asList(packagesToChangeMeizu).contains(packageName)) {
             propsToChange.putAll(propsToChangeMeizu);
+        } else if (Arrays.asList(packagesToChangeNothing).contains(packageName)) {
+            propsToChange.putAll(propsToChangeNothing);   
         }
         dlog("Defining props for: " + packageName);
         for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
