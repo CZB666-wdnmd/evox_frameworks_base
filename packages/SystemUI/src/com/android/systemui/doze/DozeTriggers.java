@@ -32,6 +32,7 @@ import android.os.Looper;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.IndentingPrintWriter;
 import android.util.Log;
@@ -49,6 +50,7 @@ import com.android.systemui.dock.DockManager;
 import com.android.systemui.doze.DozeMachine.State;
 import com.android.systemui.doze.dagger.DozeScope;
 import com.android.systemui.log.SessionTracker;
+import com.android.systemui.res.R;
 import com.android.systemui.settings.UserTracker;
 import com.android.systemui.statusbar.phone.DozeParameters;
 import com.android.systemui.statusbar.policy.DevicePostureController;
@@ -196,6 +198,8 @@ public class DozeTriggers implements DozeMachine.Part {
         }
     }
 
+    private boolean mPulseLightOnFaceDown = false;
+
     @Inject
     public DozeTriggers(Context context, DozeHost dozeHost,
             AmbientDisplayConfiguration config,
@@ -234,6 +238,8 @@ public class DozeTriggers implements DozeMachine.Part {
         mSelectedUserInteractor = selectedUserInteractor;
         mTapDelay = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_singleTapDelay);
+        mPulseLightOnFaceDown = mContext.getResources()
+                .getBoolean(R.bool.config_showEdgeLightOnlyWhenFaceDown);
     }
 
     @Override
@@ -268,9 +274,19 @@ public class DozeTriggers implements DozeMachine.Part {
             mDozeLog.tracePulseDropped("dozeSuppressed");
             return;
         }
-        requestPulse(DozeLog.PULSE_REASON_NOTIFICATION, false /* performedProxCheck */,
+        // Consider proximity check is done already
+        // if edge light on face down enabled
+        boolean performedProxCheck = canShowPulseLight();
+        requestPulse(DozeLog.PULSE_REASON_NOTIFICATION, performedProxCheck /* performedProxCheck */,
                 onPulseSuppressedListener);
         mDozeLog.traceNotificationPulse();
+    }
+
+    private boolean canShowPulseLight() {
+        return mPulseLightOnFaceDown
+                && (Settings.Secure.getIntForUser(
+                mContext.getContentResolver(), Settings.Secure.PULSE_AMBIENT_LIGHT,
+                0, UserHandle.USER_CURRENT) != 0);
     }
 
     private static void runIfNotNull(Runnable runnable) {

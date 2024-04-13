@@ -38,6 +38,7 @@ import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.CrossFadeHelper;
 import com.android.systemui.statusbar.HeadsUpStatusBarView;
 import com.android.systemui.statusbar.StatusBarState;
+import com.android.systemui.statusbar.carrierlabel.CarrierLabel;
 import com.android.systemui.statusbar.notification.NotificationWakeUpCoordinator;
 import com.android.systemui.statusbar.notification.SourceType;
 import com.android.systemui.statusbar.notification.collection.NotificationEntry;
@@ -95,6 +96,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
     private final Optional<View> mOperatorNameViewOptional;
 
     private final LogoImage mLeftLogo;
+    private final CarrierLabel mCustomCarrierLabel;
 
     @VisibleForTesting
     float mExpandedHeight;
@@ -159,6 +161,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
         mDarkIconDispatcher = darkIconDispatcher;
         mClockController = new ClockController(statusBarView.getContext(), statusBarView);
         mLeftLogo = statusBarView.findViewById(R.id.statusbar_logo);
+        mCustomCarrierLabel = statusBarView.findViewById(R.id.statusbar_carrier_text);
 
         mView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -289,12 +292,16 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
                 mOperatorNameViewOptional.ifPresent(view -> hide(view, View.INVISIBLE));
                 if (mLeftLogo.getVisibility() != View.GONE)
                     mLeftLogo.setVisibility(View.INVISIBLE);
+                if (mCustomCarrierLabel.getVisibility() != View.GONE)
+                    mCustomCarrierLabel.setVisibility(View.INVISIBLE);
                 if (mLyricViewController != null) {
                     mLyricViewController.hideLyricView(mAnimationsEnabled);
                 }
             } else {
                 if (mLeftLogo.getVisibility() != View.GONE)
                     mLeftLogo.setVisibility(View.VISIBLE);
+                if (mCustomCarrierLabel.getVisibility() != View.GONE)
+                    mCustomCarrierLabel.setVisibility(View.INVISIBLE);
                 if (isClock) {
                     show(clockView);
                 }
